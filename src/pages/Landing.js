@@ -59,7 +59,6 @@ const Landing=()=> {
     setLoader(true)
     var responseRecieved = await Method.getProjectAllAvailable()
     if (responseRecieved.status) {
-      console.log("recieved---------"+JSON.stringify(responseRecieved.data))
       setAllProjects(responseRecieved.data)
     }
     setLoader(false)
@@ -85,11 +84,9 @@ const Landing=()=> {
 
 
   const checkSprintsAvailable=async()=>{
-    console.log("checkSprintsAvailable>>>>>>>>>>>>>>>>>>>>"+projectId)
     var responseRecieved  = await Method.getSprintList(projectId)
 
     if (responseRecieved.status) {
-      console.log("data-----------"+JSON.stringify(responseRecieved.data))
       if (responseRecieved.data.length > 0) {
           
           // localStorage.setItem("project", projectId);
@@ -113,10 +110,6 @@ const Landing=()=> {
 
 
   const onProjectSelect=(e)=>{
-    // let selectElement = document.getElementById('myProjects');
-    // let selectedIndex = selectElement.options[selectElement.selectedIndex].index;
-    console.log("-----------selectedValue---------"+ JSON.stringify(allProjects[Number(e)]))
-    console.log("-----------project anme---------"+ JSON.stringify(allProjects[Number(e)].zs_project_name ))
 
     // setSelectedTeam(selectedValue)
     setProjectId(allProjects[Number(e)].id)
@@ -148,8 +141,6 @@ const Landing=()=> {
     // }else{
 
     if(selectedProject.hasOwnProperty("id")){
-      console.log("recieved settings-----"+ selectedProject.project_settings) 
-      console.log("recieved settings-----"+ JSON.parse(selectedProject.project_settings).teams) 
       localStorage.setItem("project", JSON.stringify(selectedProject));
       // getSelectedProjectSettings()
 
@@ -166,7 +157,6 @@ const Landing=()=> {
 
 
   const confirmationDone=()=>{
-    console.log("------------done--------")
     var elem = document.getElementById("PinPopup")
     var instance = M.Modal.getInstance(elem)
     instance.close()
@@ -179,8 +169,6 @@ const Landing=()=> {
 
 
   const confirmationSprintPin=()=>{
-    console.log("------------sprint pin--------")
-    console.log("------------done--------")
     var elem = document.getElementById("SprintPinPopup")
     var instance = M.Modal.getInstance(elem)
     instance.close()
@@ -198,7 +186,6 @@ const Landing=()=> {
   }
 
   const updateSelectedProjectToManage=(e)=>{
-      console.log("----------updateSelectedProjectToManage-------"+JSON.stringify(e))
       setSelectedProjectToManage(e)
       // var responseRecieved = await Method.deleteProject()
   }

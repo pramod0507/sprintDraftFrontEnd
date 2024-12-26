@@ -96,7 +96,7 @@ const SprintPinPopup=(props)=> {
                     placeholder = "*"
                     key={index}
                     ref={(el) => (inputRefs.current[index] = el)}
-                    type="text"
+                    type="password"
                     maxLength="1"
                     onChange={(e) => handleInputChange(e, index)}
                   />

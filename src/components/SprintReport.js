@@ -130,7 +130,7 @@ const SprintReport=(props)=> {
         <tr key={index}>
           <td>
               <div className="d-flex">
-                 {item.userDetail.displayName}
+                 {item.hasOwnProperty("inTeam") && item.inTeam == false?<s className="grey-text">{item.userDetail.displayName}</s>: item.userDetail.displayName}
               </div>
               <div className="grey-text f-10">
                 {item.role == "qa"? "QA Resource": "Dev Resource"}
@@ -156,8 +156,8 @@ const SprintReport=(props)=> {
           <td>
               <div className="d-flex">
                 {item.buffer > 0 && item.buffer < 100?
-                 ( ( (props.totalSprintHrsFoeEachuser - ((Number(item.leave)  + Number(item.meetings)) * props.sprintSettings.perDay)) - (props.totalSprintHrsFoeEachuser - ((Number(item.leave)  + Number(item.meetings)) * props.sprintSettings.perDay))*(item.buffer/100) )  ).toFixed(2)   : item.buffer >= 100 || item.buffer < 0 ? "-": null
-                } hrs
+                 ( ( (props.totalSprintHrsFoeEachuser - ((Number(item.leave)  + Number(item.meetings)) * props.sprintSettings.perDay)) - (props.totalSprintHrsFoeEachuser - ((Number(item.leave)  + Number(item.meetings)) * props.sprintSettings.perDay))*(item.buffer/100) )  ).toFixed(2) +" hrs"   : item.buffer >= 100 || item.buffer < 0 ? "-": null
+                } 
               </div>
             </td>
           <td>{item.allocatedHrs === 0?"-":item.allocatedHrs}  {item.allocatedHrs >0?"hrs":null}</td>
@@ -168,7 +168,9 @@ const SprintReport=(props)=> {
                 </div>
               :
               <div>
-                <div className="">{ (( (props.totalSprintHrsFoeEachuser - (props.totalSprintHrsFoeEachuser)*(item.buffer/100)) - ((Number(item.leave)  + Number(item.meetings)) * props.sprintSettings.perDay) ).toFixed(2) - (item.allocatedHrs).toFixed(2)).toFixed(2)  } hrs</div>
+                <div className="">{ ((props.totalSprintHrsFoeEachuser - (props.totalSprintHrsFoeEachuser)*(item.buffer/100)) - 
+(((Number(item.leave)  + Number(item.meetings)) * props.sprintSettings.perDay) - (  ((Number(item.leave)  + Number(item.meetings)) * props.sprintSettings.perDay) * (item.buffer/100))) - 
+                    ((item.allocatedHrs).toFixed(2)) ).toFixed(2) } hrs</div>
 
               </div>
             }

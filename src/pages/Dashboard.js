@@ -20,6 +20,7 @@ import Lottie from 'lottie-react-web';
 import AssignSprint from '../components/AssignSprint';
 import WorkLogPopup from '../components/WorkLogPopup';
 import SprintReport from '../components/SprintReport';
+import DeleteConfirmation from '../components/DeleteConfirmation.js'
 
 
 function Dashboard() {
@@ -45,6 +46,8 @@ function Dashboard() {
   const [teamList,setTeamList] = useState([]);
 
   const [sprintSettings,setSprintSettings] = useState({days:0, perDay:0, holiday:0,sprintBuffer:0})
+  const [sprintSettingsRaw, setSprintSettingsRaw] = useState({})
+
   const [totalSprintHrsFoeEachuser, setTotalSprintHrsFoeEachuser] = useState(0)
 
   const [loader,setLoader] = useState(false)
@@ -219,7 +222,8 @@ function Dashboard() {
       tempUsers.push(...selectedUsers) 
      
      //remove previous spillover added values
-     if(![0,null].includes(tempAllData[selectedIndex].fields.assignee)){     
+     if(![0,null].includes(tempAllData[selectedIndex].fields.assignee)){ 
+           
         var assigneeIndex = tempUsers.findIndex(x=> x.userDetail.accountId === tempAllData[selectedIndex].fields.assignee.accountId )
 
         if(assigneeIndex !== -1 && tempUsers[assigneeIndex].role === "dev"){
@@ -236,16 +240,20 @@ function Dashboard() {
           //add new value to users
           tempUsers[assigneeIndex].allocatedHrs = tempUsers[assigneeIndex].allocatedHrs + Number(newQAhr)
         }
-      }
+      }  
 
       if( ![0,null].includes(tempAllData[selectedIndex].fields[projectSettings.qa_hr_key])){
-        var qaIndex = tempUsers.findIndex(x=> x.userDetail.accountId === tempAllData[selectedIndex].fields[projectSettings.qa_user_field].accountId )
+        
+        if(![0,null].includes(tempAllData[selectedIndex].fields[projectSettings.qa_user_field])){
+          var qaIndex = tempUsers.findIndex(x=> x.userDetail.accountId === tempAllData[selectedIndex].fields[projectSettings.qa_user_field].accountId )
 
-        if(qaIndex !== -1 && tempUsers[qaIndex].role === "qa"){
-          tempUsers[qaIndex].allocatedHrs = tempUsers[qaIndex].allocatedHrs - tempAllData[selectedIndex].remainingQaHr
-          //add new value to users
-          tempUsers[qaIndex].allocatedHrs = tempUsers[qaIndex].allocatedHrs + Number(newQAhr)
+          if(qaIndex !== -1 && tempUsers[qaIndex].role === "qa"){
+            tempUsers[qaIndex].allocatedHrs = tempUsers[qaIndex].allocatedHrs - tempAllData[selectedIndex].remainingQaHr
+            //add new value to users
+            tempUsers[qaIndex].allocatedHrs = tempUsers[qaIndex].allocatedHrs + Number(newQAhr)
+          }
         }
+        
       }
       
 
@@ -354,6 +362,7 @@ function Dashboard() {
     try{
       var responseRecieved = await Method.getSprintData(proId, sprId, localStorage.getItem("selectedTeam"))
       if(responseRecieved.status){
+        setSprintSettingsRaw(responseRecieved.data[0])
         setSprintSettings( JSON.parse(responseRecieved.data[0].sprint_settings) )
         //add tickets
         var sprintTicketsTemp = JSON.parse(responseRecieved.data[0].sprint_tickets)
@@ -432,8 +441,11 @@ function Dashboard() {
             var temp = 
             (foreachuserHrs - Number((Number(users[i].leave) + Number(users[i].meetings)) * sprintData.perDay)) - 
             ((foreachuserHrs - Number((Number(users[i].leave)  + Number(users[i].meetings)) * sprintData.perDay))*Number(users[i].buffer/100 )).toFixed(2)
+           
+            if(Number(temp) > 0){
+              tempQA = tempQA + Number(temp)
+            }
             
-            tempQA = tempQA + Number(temp)
 
           }
         
@@ -444,8 +456,11 @@ function Dashboard() {
             
           }else{
             var temp = (foreachuserHrs - Number((Number(users[i].leave) + Number(users[i].meetings)) * sprintData.perDay)) - ((foreachuserHrs - Number((Number(users[i].leave)  + Number(users[i].meetings)) * sprintData.perDay))*Number(users[i].buffer/100 )).toFixed(2)
+           
+            if(Number(temp) > 0){
+              tempDev = tempDev + Number(temp)
+            }
             
-            tempDev = tempDev + Number(temp)
 
            
           }
@@ -494,7 +509,6 @@ function Dashboard() {
 
   const jiraAddedCalculateUsersAssignedHrs=(userList, jiraList, isSpilloverFlow)=>{
     var tempUsers =userList
-
     for (var i = 0; i < jiraList.length; i++) {
 
        //check for assigne present
@@ -514,9 +528,16 @@ function Dashboard() {
                     tempUsers[index].allocatedHrs = 0 + tempUsers[index].allocatedHrs
                   }else{
 
+                    //check qa assinee is also available
                     if (![0,null].includes(jiraList[i].fields[projectSettings.dev_hr_key])) {
+                      
                       tempUsers[index].allocatedHrs = Number(jiraList[i].fields[projectSettings.dev_hr_key]) + tempUsers[index].allocatedHrs
+                    }else if([0,null].includes(jiraList[i].fields[projectSettings.dev_hr_key]) && jiraList[i].fields[projectSettings.qa_user_field] !== null){
+                      
+                      tempUsers[index].allocatedHrs = Number(jiraList[i].fields[projectSettings.dev_hr_key]) + tempUsers[index].allocatedHrs
+
                     }else if(![0,null].includes(jiraList[i].fields[projectSettings.qa_hr_key])){
+                      
                       tempUsers[index].allocatedHrs = Number(jiraList[i].fields[projectSettings.qa_hr_key]) + tempUsers[index].allocatedHrs
                     }
                     
@@ -528,20 +549,20 @@ function Dashboard() {
               if( ![0,null].includes(jiraList[i].fields[projectSettings.dev_hr_key])){
                 //if assinee and dev hrs not null
                 if(jiraList[i].category === "SPILLOVERS"){
-                  tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"dev", allocatedHrs:0, meetings: 0})  
+                  tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"dev", allocatedHrs:0, meetings: 0, inTeam: true})  
                 }else{
-                  tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"dev", allocatedHrs:Number(jiraList[i].fields[projectSettings.dev_hr_key]), meetings: 0})
+                  tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"dev", allocatedHrs:Number(jiraList[i].fields[projectSettings.dev_hr_key]), meetings: 0, inTeam: true})
                 }
                 
               }else if( ![0,null].includes(jiraList[i].fields[projectSettings.qa_hr_key])){
                  //if assignee and qa hr not null 
               if(jiraList[i].category === "SPILLOVERS"){
-                  tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"qa", allocatedHrs:0, meetings: 0})
+                  tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"qa", allocatedHrs:0, meetings: 0, inTeam: true})
                 }else{
-                  tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"qa", allocatedHrs:Number(jiraList[i].fields[projectSettings.qa_hr_key]), meetings: 0})
+                  tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"qa", allocatedHrs:Number(jiraList[i].fields[projectSettings.qa_hr_key]), meetings: 0, inTeam: true})
                 }
               }else{
-                tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"qa", allocatedHrs:0, meetings: 0})
+                tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"qa", allocatedHrs:0, meetings: 0, inTeam: true})
               }
           }
         }
@@ -567,9 +588,9 @@ function Dashboard() {
           }else{
               if( jiraList[i].fields[projectSettings.qa_hr_key] !== null){   
                 if(jiraList[i].category === "SPILLOVERS"){
-                  tempUsers.push({userDetail: jiraList[i].fields[projectSettings.qa_user_field], buffer:0, leave:0, role:"qa", allocatedHrs:0, meetings: 0})
+                  tempUsers.push({userDetail: jiraList[i].fields[projectSettings.qa_user_field], buffer:0, leave:0, role:"qa", allocatedHrs:0, meetings: 0, inTeam: true})
                 }else{
-                  tempUsers.push({userDetail: jiraList[i].fields[projectSettings.qa_user_field], buffer:0, leave:0, role:"qa", allocatedHrs:Number(jiraList[i].fields[projectSettings.qa_hr_key]), meetings: 0})
+                  tempUsers.push({userDetail: jiraList[i].fields[projectSettings.qa_user_field], buffer:0, leave:0, role:"qa", allocatedHrs:Number(jiraList[i].fields[projectSettings.qa_hr_key]), meetings: 0, inTeam: true})
                 }        
                 
               }
@@ -599,13 +620,15 @@ function Dashboard() {
       for (var i = 0; i< tempAllData.length; i++) {
 
         var tempProjectSetting = JSON.parse(localStorage.getItem("project"))
+
         if(tempAllData[i].category === "SPILLOVERS"){
-          if(tempAllData[i].fields[tempProjectSetting.dev_hr_key] !== null){
+          if(tempAllData[i].devEnabled){
             tempDev = tempDev + Number(tempAllData[i].remainingDevHr)
             tempSpilloverDev = tempSpilloverDev + Number(tempAllData[i].remainingDevHr) 
           }
 
-          if(tempAllData[i].fields[tempProjectSetting.qa_hr_key] !== null){
+          if(tempAllData[i].qaEnabled){
+            
             tempQA = tempQA + Number(tempAllData[i].remainingQaHr)
             tempSpilloverQA = tempSpilloverQA + Number(tempAllData[i].remainingQaHr)
           }
@@ -641,6 +664,9 @@ function Dashboard() {
 
             }
           }
+
+
+
           
         }
 
@@ -742,7 +768,7 @@ function Dashboard() {
 
       var hrs = await checkAddedUserHasTicketAssigned(e[i],role )
 
-      var eachElement = {userDetail: e[i], buffer:0, leave:0, role: role, allocatedHrs:hrs, meetings: 0}
+      var eachElement = {userDetail: e[i], buffer:0, leave:0, role: role, allocatedHrs:hrs, meetings: 0, inTeam: true}
       temp.push(eachElement)
 
       setUnsavedChanges(true)
@@ -807,7 +833,8 @@ function Dashboard() {
     instance.open()
   }
 
-  const onUserDataSave=(buffer,leave, role, meetings)=>{
+  const onUserDataSave=(buffer,leave, role, meetings, inTeam)=>{
+    
     var temp = []
     temp = temp.concat( selectedUsers )
     var index = temp.findIndex(x=> x.userDetail.accountId ===  selectedUserForEdit.userDetail.accountId)
@@ -815,6 +842,8 @@ function Dashboard() {
     temp[index].leave = leave
     temp[index].role = role
     temp[index].meetings = Number(meetings)
+    temp[index].inTeam = inTeam
+    
     setSelectedUsers(temp,[getTotalResourceHrAvailable(temp,totalSprintHrsFoeEachuser, sprintSettings)])
     M.toast({html: '<span style="color:yellow">User data updated</span>', classes: 'rounded'})
 
@@ -863,8 +892,6 @@ function Dashboard() {
 
         temp[index].allocatedHrs = temp[index].allocatedHrs - hrsToReduce
       }
-
-
       setSelectedUsers(temp)
     }
   }
@@ -879,9 +906,8 @@ function Dashboard() {
     
     if(e.fields.assignee !== null){
       var hrs = 0
-
-
-      if( ![0,null].includes( e.fields[projectSettings.dev_hr_key] ) && e.devEnabled ){
+      //check dev assign is present
+      if( ![0,null].includes( e.fields[projectSettings.dev_hr_key] ) && e.devEnabled){
         
         if(e.category === "SPILLOVERS"){
           hrs = Number(e.remainingDevHr)
@@ -889,20 +915,28 @@ function Dashboard() {
           hrs = Number(e.fields[projectSettings.dev_hr_key])  
         }
         
+
         reduceHrFromSelectedUser(e.fields.assignee, hrs)
-       
-      }else if([0,null].includes( e.fields[projectSettings.dev_hr_key] ) && ![0,null].includes(e.fields[projectSettings.qa_hr_key] && e.qaEnabled)){
+      } else if( e.fields[projectSettings.qa_user_field] !== null && [0,null].includes(e.fields[projectSettings.dev_hr_key]) && e.devEnabled){
+
+        if(e.category === "SPILLOVERS"){
+          hrs = Number(e.remainingDevHr)
+        }else{
+          hrs = Number(e.fields[projectSettings.dev_hr_key])  
+        }
+
+        reduceHrFromSelectedUser(e.fields.assignee, hrs)
+
+      }
+      else if([0,null].includes( e.fields[projectSettings.dev_hr_key] ) && ![0,null].includes(e.fields[projectSettings.qa_hr_key]) && e.qaEnabled){
         
         if(e.category === "SPILLOVERS"){
           hrs = Number(e.remainingQaHr)
         }else{
           hrs = e.fields[projectSettings.qa_hr_key]
         }
-        
         reduceHrFromSelectedUser(e.fields.assignee, hrs)
       }
-      
-      
     }
 
     if(e.fields[projectSettings.qa_user_field] !== null  && e.qaEnabled){
@@ -937,7 +971,13 @@ function Dashboard() {
 
       for (var i = 0; i< tempAllData.length; i++) {
         if(tempAllData[i].fields[projectSettings.dev_hr_key] !== null){
-          tempDev = tempDev + tempAllData[i].fields[projectSettings.dev_hr_key]
+          
+          if (tempAllData[i].category === "SPILLOVERS" && tempAllData[i].devEnabled == true) {
+            tempDev = tempDev + Number(tempAllData[i].remainingDevHr)
+          }else{
+            tempDev = tempDev + tempAllData[i].fields[projectSettings.dev_hr_key]
+          }
+          
           
           if(tempAllData[i].category === "TECH TASKS"){
                 tempTechDev = tempTechDev + tempAllData[i].fields[projectSettings.dev_hr_key]
@@ -949,7 +989,13 @@ function Dashboard() {
         }
 
         if(tempAllData[i].fields[projectSettings.qa_hr_key] !== null){
-          tempQA = tempQA + tempAllData[i].fields[projectSettings.qa_hr_key]
+
+          if (tempAllData[i].category === "SPILLOVERS" && tempAllData[i].qaEnabled == true) {
+            tempQA = tempQA + Number(tempAllData[i].remainingQaHr)
+          }else{
+            tempQA = tempQA + tempAllData[i].fields[projectSettings.qa_hr_key]
+          }
+          
           
           if(tempAllData[i].category === "TECH TASKS"){
                 tempTechQA = tempTechQA + tempAllData[i].fields[projectSettings.qa_hr_key]
@@ -960,6 +1006,8 @@ function Dashboard() {
               }
         } 
       }
+
+
       setTotalDevTechHrFromJira(tempTechDev)
       setTotalQATechHrFromJira(tempTechQA)
 
@@ -969,7 +1017,6 @@ function Dashboard() {
       setTotalDevSpilloverHrFromJira(tempSpilloverDev)
       setTotalQASpilloverHrFromJira(tempSpilloverQA)
 
-      
       setTotalDevHrFromJira(tempDev)    
       setTotalQAHrFromJira(tempQA)
 
@@ -1003,10 +1050,11 @@ function Dashboard() {
   const renderUsersRows=()=>{
     return(
       selectedUsers.map((item, index) =>
+
         <tr key={index} className="hand" onClick={()=>{onUserRowClick(item)}}>
           <td>
               <div className="d-flex" style={{width:120}}>
-                 {item.userDetail.displayName}
+                 {item.hasOwnProperty("inTeam") && item.inTeam == false?<s className="grey-text">{item.userDetail.displayName}</s>: item.userDetail.displayName}
               </div>
               <div className="grey-text f-10">
                 {item.role == "qa"? "QA Resource": "Dev Resource"}
@@ -1031,11 +1079,11 @@ function Dashboard() {
           <td>
               <div className="d-flex">
                 {item.buffer > 0 && item.buffer < 100?
-                 ( ( (totalSprintHrsFoeEachuser - ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay)) - (totalSprintHrsFoeEachuser - ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay))*(item.buffer/100) )  ).toFixed(2)   : item.buffer >= 100 || item.buffer < 0 ? "-": null
-                }
+                 ( ( (totalSprintHrsFoeEachuser - ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay)) - (totalSprintHrsFoeEachuser - ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay))*(item.buffer/100) )  ).toFixed(2) +" hrs"   : item.buffer >= 100 || item.buffer < 0 ? "-": null
+                } 
               </div>
             </td>
-          <td>{item.allocatedHrs === 0?"-":item.allocatedHrs}</td>
+          <td>{item.allocatedHrs === 0?"-":item.allocatedHrs+" hrs"} </td>
           <td style={{width:75}}>
             {item.buffer >= 100?
               <div className="progress">
@@ -1044,11 +1092,18 @@ function Dashboard() {
                 </div>
               :
               <div>
-                    <div className="f-10">{ (( (totalSprintHrsFoeEachuser - (totalSprintHrsFoeEachuser)*(item.buffer/100)) - ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) ).toFixed(2) - (item.allocatedHrs).toFixed(2)).toFixed(2)  } hrs</div>
+                    <div className="f-10">{ ((totalSprintHrsFoeEachuser - (totalSprintHrsFoeEachuser)*(item.buffer/100)) - 
+(((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) - (  ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) * (item.buffer/100))) - 
+                    ((item.allocatedHrs).toFixed(2)) ).toFixed(2) } hrs</div>
+
+                    <div>{}</div>
 
                     {
                       <div className="progress">
-                        <div className= {`determinate ${item.allocatedHrs / ( (totalSprintHrsFoeEachuser - (totalSprintHrsFoeEachuser)*(item.buffer/100)) - ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) ).toFixed(2)*100 > 100?"orange": "teal"} `} style={{width:  item.allocatedHrs / ( (totalSprintHrsFoeEachuser - (totalSprintHrsFoeEachuser)*(item.buffer/100)) - ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) ).toFixed(2)*100 > 0? item.allocatedHrs / ( (totalSprintHrsFoeEachuser - (totalSprintHrsFoeEachuser)*(item.buffer/100)) - ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) ).toFixed(2)*100+'%' :  0+'%'}}></div>
+                        <div className= {`determinate ${(item.allocatedHrs / ( (totalSprintHrsFoeEachuser - (totalSprintHrsFoeEachuser)*(item.buffer/100)) - 
+(((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) - (  ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) * (item.buffer/100)))  )).toFixed(2)*100 > 100?"orange": "teal"} `} style={{width:  (item.allocatedHrs / ( (totalSprintHrsFoeEachuser - (totalSprintHrsFoeEachuser)*(item.buffer/100)) - 
+(((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) - (  ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) * (item.buffer/100))) )).toFixed(2)*100 > 0? (item.allocatedHrs / ( (totalSprintHrsFoeEachuser - (totalSprintHrsFoeEachuser)*(item.buffer/100)) - 
+(((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) - (  ((Number(item.leave)  + Number(item.meetings)) * sprintSettings.perDay) * (item.buffer/100)))  )).toFixed(2)*100+'%' :  0+'%'}}></div>
                     </div>
                   }
               </div>
@@ -1139,8 +1194,10 @@ function Dashboard() {
                   :null 
                   }
                   <div className="wrapLabel">{badges(item.fields.labels)}</div>
-                  {/*<div className="">{item.fields.assignee.displayName}</div>*/}
                 </div>
+
+                <div className="m-top-10 grey-text f-10">{item.fields.assignee.displayName} {item.fields[projectSettings.qa_user_field] !== null? ` | ${item.fields[projectSettings.qa_user_field].displayName}`: null}</div>
+
 
                 <div className="f-10 grey-text m-top-10">{(item.fields.aggregatetimespent/3600).toFixed(2)}hrs/{(item.fields.aggregatetimeoriginalestimate/3600).toFixed(2)}hrs</div>
 
@@ -1151,7 +1208,51 @@ function Dashboard() {
                   </div>
                   }
             </td>
-            <td className="f-bold">{item.fields.aggregatetimeoriginalestimate == 0? "-": item.fields.aggregatetimeoriginalestimate/3600}</td>
+            <td className="">
+              <div className="d-flex">
+                {item.category === "SPILLOVERS" || !item.qaEnabled || !item.devEnabled?
+                  <div className=""><s>{item.fields.aggregatetimeoriginalestimate == 0? "-": item.fields.aggregatetimeoriginalestimate/3600}</s>
+                  </div>
+                  :
+                  <div className="f-bold">{item.fields.aggregatetimeoriginalestimate == 0? "-": item.fields.aggregatetimeoriginalestimate/3600}
+                  </div>
+                }
+                <div className="p-left-5">
+                  {item.category === "SPILLOVERS" || !item.qaEnabled || !item.devEnabled?<s>hrs</s>:<div>hrs</div>}
+                  
+                </div>
+              </div>
+
+              {item.category === "SPILLOVERS"?
+                <div className="d-flex">
+                  <div className="f-bold">
+                    {Number(item.remainingDevHr) + Number(item.remainingQaHr)}
+                  </div>
+                  <div className="p-left-5">hrs</div>
+                </div>
+                :
+                !item.qaEnabled?
+                <div className="d-flex">
+                  <div className="f-bold">
+                    {Number(item.fields[projectSettings.dev_hr_key])}
+                  </div>
+                  <div className="p-left-5">hrs</div>
+                </div>
+                :
+                !item.devEnabled?
+                <div className="d-flex">
+                  <div className="f-bold">
+                    {Number(item.fields[projectSettings.qa_hr_key])}
+                  </div>
+                  <div className="p-left-5">hrs</div>
+                </div> 
+                :
+                null
+              }
+
+              
+              
+            </td>
             <td style={{width:70}} className="center-align">
               {item.category === "SPILLOVERS"?
               <div>
@@ -1244,6 +1345,23 @@ function Dashboard() {
     var instance = M.Modal.getInstance(elem)
     instance.open()
   }
+
+  const deleteSprint=()=>{
+    var elem = document.getElementById("DeleteConfirmation")
+    var instance = M.Modal.getInstance(elem)
+    instance.open()
+    
+  }
+
+  const onDeleteConfirmation=async()=>{
+    var responseRecieved = await Method.deleteSprint(sprintSettingsRaw.id)
+    if (responseRecieved.status) {
+      localStorage.removeItem("project")
+      localStorage.removeItem("sprints")
+      localStorage.removeItem("selectedSprint")
+      navigate('/')
+    }
+  }
   
 
 
@@ -1257,7 +1375,7 @@ function Dashboard() {
                 <img className="h-50p" src={logo} alt="Logo" style={{marginTop:7, padding:5, paddingLeft:20}}/>
               </a>
 
-              <div className="teal-text text-lighten-1 p-left-5 f-17 hide-on-small-only" onClick={()=>{openReportModal()}}> | SPRINT DRAFT</div>
+              <div className="teal-text text-lighten-1 p-left-5 f-17 hide-on-small-only"> | SPRINT DRAFT</div>
 
               <div className="d-flex m-bottom-20">
                 <div className="black-text m-left-50 hide-on-small-only">{projectSettings.zs_project_name} > {sprintId} > {selectedTeam}</div>
@@ -1279,6 +1397,10 @@ function Dashboard() {
           </div>
           :
           <div className="d-flex">
+            {!fullSiteLoader && !isEditEnabled?
+              <i class="material-icons orange-text p-20-right hand"  onClick={()=>{openReportModal()}} style={{fontSize:40, marginTop:2}}>picture_as_pdf</i>
+              :null
+            }
             {unsavedChanges?
               <div className="red-text m-right-10 d-flex">
                  <i className="material-icons " style={{marginRight:5, fontSize:14}}>warning</i>
@@ -1287,7 +1409,7 @@ function Dashboard() {
               :null
             }
             {isEditEnabled?
-            <div className="d-flex ">
+            <div className="d-flex">
               
               
               <div className="d-flex">
@@ -1307,16 +1429,25 @@ function Dashboard() {
                 </div>
 
                 <div>
+                  <a className="red b-r-3 btn m-right-10 waves-effect waves-light"  onClick={()=>{deleteSprint()}}>Delete</a>
+                </div>
+
+                <div>
                 {unsavedChanges?null:
-                <a className="b-r-3 b-thin btn-flat m-right-10 waves-effect waves-light"  onClick={()=>{setIsEditEnabled(false)}}>Cancel</a>
+                  <a className="b-r-3 b-thin btn-flat m-right-10 waves-effect waves-light"  onClick={()=>{setIsEditEnabled(false)}}>Cancel</a>
                 }
+
+                
               </div>
 
               </div>
             </div>
             :
             <div>
-            <a className="waves-effect waves-light btn m-right-10"  onClick={()=>{onEdit()}}>edit</a>
+              {!fullSiteLoader?
+                <a className="waves-effect waves-light btn m-right-10"  onClick={()=>{onEdit()}}>edit</a>
+                :null
+              }
             </div>
             }
           </div>
@@ -1573,7 +1704,7 @@ function Dashboard() {
                     <div>Reserved</div>
                     <div className="f-10 grey-text lighten-3 f-normal">Meetings | Training | Scrum</div>
                   </th>
-                  <th>HRS</th>
+                  <th>AVAILABLE</th>
                   <th>ASSIGNED</th>
                   <th className="d-flex j-end">
                     {isEditEnabled && !sprintSettings.isFreez?
@@ -1621,6 +1752,8 @@ function Dashboard() {
       <SprintReport selectedUsers={selectedUsers} totalSprintHrsFoeEachuser={totalSprintHrsFoeEachuser} sprintSettings={sprintSettings} projectSettings={projectSettings} totalDevHrFromJira={totalDevHrFromJira} totalDevResourceHr={totalDevResourceHr} totalDevTechHrFromJira={totalDevTechHrFromJira} totalQAResourceHr={totalQAResourceHr} totalDevBusinessHrFromJira={totalDevBusinessHrFromJira} totalDevSpilloverHrFromJira={totalDevSpilloverHrFromJira} totalQAHrFromJira={totalQAHrFromJira} totalQATechHrFromJira={totalQATechHrFromJira} totalQABusinessHrFromJira={totalQABusinessHrFromJira} totalQASpilloverHrFromJira={totalQASpilloverHrFromJira}
         sprintId={sprintId}
       />
+
+      <DeleteConfirmation onDeleteConfirmation={onDeleteConfirmation}/>
     </div>
   );
 }

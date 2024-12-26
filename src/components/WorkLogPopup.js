@@ -73,7 +73,6 @@ const WorkLogPopup=(props)=> {
   const getWorkLog = async()=>{
     var responseRecieved = await Method.workLogOfJiraID(props.selectedJira.key)
       if(responseRecieved.status){
-        console.log("work log recieved>>>>>>>>>>>>>>>>>>"+JSON.stringify(responseRecieved.data))
         setWorkLogData(responseRecieved.data)
         updateRoleHrs(responseRecieved.data)
       }

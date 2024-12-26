@@ -48,7 +48,7 @@ const DeleteConfirmation=(props)=> {
               Are you sure want to delete this ? This is cannot be undone once procceded.
             </div>
             <div className="f-14 m-top-10">
-              All the data associated with this project will also be deleted permanently
+              All associated data will be permanently deleted as well.
             </div>
 
             <div className="d-flex m-top-50">

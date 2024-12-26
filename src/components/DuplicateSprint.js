@@ -95,7 +95,6 @@ const DuplicateSprint=(props)=> {
   const jiraToggled=()=>{
 
      var isChecked=document.getElementById("jiraTickets").checked;
-     console.log(isChecked);
      
      if(isChecked == true){
         setIsCopyusersEnabled(true)

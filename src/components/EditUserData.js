@@ -15,9 +15,9 @@ const EditUserData=(props)=> {
   const [name, setName] = useState("")
   const [role, setRole] = useState("dev")
   const [meetings, setMeetings] = useState(0)
+  const [isUserInTeam, setIsUserInTeam] = useState(true)
 
   const navigate = useNavigate();
-
 
   useEffect(() => {
       M.AutoInit()
@@ -30,10 +30,13 @@ const EditUserData=(props)=> {
         setRole(props.selectedUserForEdit.role)
         setMeetings(props.selectedUserForEdit.meetings)
 
-
+        if( props.selectedUserForEdit.hasOwnProperty("inTeam") ){
+          setIsUserInTeam(props.selectedUserForEdit.inTeam)
+        }else{
+          setIsUserInTeam(true)
+        }
+        
       }
-
-      
 
       var elems = document.querySelectorAll('select');
       var instances = M.FormSelect.init(elems, {})
@@ -46,7 +49,7 @@ const EditUserData=(props)=> {
     if(buffer == 0){
      M.toast({html: '<span style="color:yellow">Add buffer</span>', classes: 'rounded'})
     }else{
-      props.onUserDataSave(buffer,leave,role, meetings)
+      props.onUserDataSave(buffer,leave,role, meetings, isUserInTeam)
       
     }
   }
@@ -58,12 +61,29 @@ const EditUserData=(props)=> {
     instance.close()
   }
 
+  const toggleTeammembership=(e)=>{
+    setIsUserInTeam(e)
+    if(e == false){
+      setBuffer(Number(100))
+    }
+    
+  }
+
 
   return (
     <div className="">
       <div id="editUserData" className="modal bottom-sheet">
           <div className="modal-content">
-            <h4>Edit User</h4>
+            <div className="d-flex j-between">
+              <h4>Edit User</h4>
+              <div class="switch" onChange={()=>{toggleTeammembership(!isUserInTeam)}}>
+                <label>
+                  <input type="checkbox" checked={isUserInTeam}/>
+                  <span class="lever"></span>
+                  User associated in this team 
+                </label>
+              </div>
+            </div>
             <p>Update leave and buffer for {props.selectedUserForEdit.hasOwnProperty("userDetail")? props.selectedUserForEdit.userDetail.displayName:null}</p>
 
             <div className="d-flex a-center">
@@ -81,7 +101,7 @@ const EditUserData=(props)=> {
 
                 <div className="input-field col s6 m-left-10">
                   <input id="meetings" type="number" value={meetings}  className="validate"  onChange={(e)=>{setMeetings(e.target.value)}}/>
-                  <label htmlFor="meetings">Meetings / Training</label>
+                  <label htmlFor="meetings">Meetings | Scrum | Training</label>
                 </div>
 
                 {props.isFreez?

@@ -58,6 +58,29 @@ const JiraDetailPopup=(props)=> {
      close()
   }
 
+  const colorbadge=(item)=>{
+      var color = "teal"
+      switch(item) {
+      case "SPILLOVERS":
+        color = "orange"
+        break;
+      case "TECH TASKS":
+        color = "green"
+        break;
+      case "BUSINESS":
+        color = "blue"
+        break;
+      case "QA AUTOMATION":
+        color = "brown"
+        break; 
+      default:
+        
+    }
+      return(
+            <span className={`${color} white-text m-left-5 f-10 p-4 b-r-3`}>{item} </span>
+      )
+    }
+
   return (
     <div className="w-100p">
       <div id="jiraDetailPopup" className="modal bottom-sheet modal-fixed-footer">
@@ -72,7 +95,7 @@ const JiraDetailPopup=(props)=> {
               <p>{props.selectedJira.fields.parent.fields.summary}</p>
               <div className="d-flex a-center" style={{marginTop:5}}>
                 <div>
-                  <span className='teal white-text m-left-5 f-10 p-4 b-r-3' >{props.selectedJiraCategory} </span>
+                  <span className='white-text m-left-5 f-10 p-4 b-r-3' >{colorbadge(props.selectedJiraCategory) } </span>
                   </div>
                   {props.selectedJira.fields.labels.length>0?
                   <div className="grey-text text-lighten-1" style={{paddingLeft:10, paddingRight:10}}>|</div>

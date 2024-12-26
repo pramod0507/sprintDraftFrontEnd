@@ -1,7 +1,6 @@
 const user =  "pramod.g.kumar@zs.com"
 const pass = ""
 
-
 // get jira ticket details
 export const getJiraTicketsDetails=async(list)=>{
 	var result= {data:{}, status: false }
@@ -593,5 +592,32 @@ export const workLogOfJiraID=async(jiraID)=>{
           result.status = false
         })
 
+        return result
+  }
+
+
+  //delete sprint
+  export const deleteSprint=async(id)=>{
+    
+      var result = {data:{}, status: false }  
+      await fetch("/sprint?id="+id, 
+        {
+          method: "DELETE",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Accept': 'application/json',
+            'User-Agent': 'PostmanRuntime/7.32.3'
+          }
+        })
+        .then((response) => response.json())
+        .then((responseJson) =>{
+          result.status = true
+        })
+        .catch(error => {
+          console.log(error)
+          result.status = false
+        })
         return result
   }
