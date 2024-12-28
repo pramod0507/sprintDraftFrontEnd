@@ -556,7 +556,12 @@ function Dashboard() {
               if(jiraList[i].category === "SPILLOVERS"){
                   tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"qa", allocatedHrs:0, meetings: 0, inTeam: true})
                 }else{
-                  tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"qa", allocatedHrs:Number(jiraList[i].fields[projectSettings.qa_hr_key]), meetings: 0, inTeam: true})
+                  
+                  //check if  assignee and qa assignee  is same user
+                  if(jiraList[i].fields.assignee !== null && jiraList[i].fields.assignee.accountId !== jiraList[i].fields[projectSettings.qa_user_field].accountId){
+                    tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"qa", allocatedHrs:Number(jiraList[i].fields[projectSettings.qa_hr_key]), meetings: 0, inTeam: true})
+                  }
+                  
                 }
               }else{
                 tempUsers.push({userDetail: jiraList[i].fields.assignee, buffer:0, leave:0, role:"qa", allocatedHrs:0, meetings: 0, inTeam: true})
@@ -694,8 +699,6 @@ function Dashboard() {
           var responseRecieved = await Method.getJiraTicketsDetails(tempList)
           for (var i = 0; i < responseRecieved.data.length ; i++) {
             var eachElement = responseRecieved.data[i]
-
-            console.log("--------"+JSON.stringify(responseRecieved.data[i]))
 
             //check if dev and qa hrs are available
             if ( !responseRecieved.data[i].fields.hasOwnProperty([projectSettings.dev_hr_key]) && !responseRecieved.data[i].fields.hasOwnProperty([projectSettings.qa_hr_key]) ) {
