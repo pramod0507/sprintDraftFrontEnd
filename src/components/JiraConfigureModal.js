@@ -13,15 +13,14 @@ const JiraConfigureModal=(props)=> {
   const [selectedJira, setSelectedJira] = useState("")
   
   const navigate = useNavigate();
-
   const [selectedDropdown, setSelectedDropDown] = useState("SPILLOVERS")
 
 
   const onSave=()=>{
     props.onSaveFromModalSetData(selectedJira, selectedDropdown, false)
     var elem = document.getElementById("jiraConfigModal")
-      var instance = M.Modal.getInstance(elem)
-      instance.close()
+    var instance = M.Modal.getInstance(elem)
+    instance.close()
   }
 
 

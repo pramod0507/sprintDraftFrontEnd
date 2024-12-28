@@ -75,7 +75,7 @@ const NewSprintModal=(props)=> {
   const renderTeams=(e)=>{
     return(
       e.map((item, index) =>
-          <option  value={item}>{item}</option>
+          <option key={"newsprint_"+index} value={item}>{item}</option>
         )
   )}
 

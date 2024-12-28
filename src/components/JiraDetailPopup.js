@@ -200,11 +200,11 @@ const JiraDetailPopup=(props)=> {
                   <div className="row">
                     <div className="input-field col s6">
                       <input id="remainingDevHr" value={remainingDevHrs} type="text" className="active" onChange={(e)=>{setRemainingDevHrs(e.target.value)}}/>
-                      <label for="remainingDevHr">Remaining DEV Hrs</label>
+                      <label htmlFor="remainingDevHr">Remaining DEV Hrs</label>
                     </div>
                     <div className="input-field col s6">
                       <input id="remainingQAHr" value={remainingQAHrs} type="text" className="active" onChange={(e)=>{setRemainingQAHrs(e.target.value)}}/>
-                      <label for="remainingQAHr">Remaining QA Hrs</label>
+                      <label htmlFor="remainingQAHr">Remaining QA Hrs</label>
                     </div>
                   </div>
 

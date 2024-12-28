@@ -11,7 +11,7 @@ const screenHeight = window.innerHeight
 
 const PinPopup=(props)=> {
   
-  const [actualPin, setActualPin] = useState("111111")
+  const [actualPin, setActualPin] = useState("332211")
 
  
   const inputRefs = useRef([]);
@@ -82,7 +82,7 @@ const PinPopup=(props)=> {
               <div className="col s2"/>
               
                 {Array.from({ length: 6 }).map((_, index) => (
-                  <div className="col s1">
+                  <div className="col s1" key={"pinpopup_"+index}>
                   <input className="b-thin center-align f-20" style={{borderRadius:5}}
                     placeholder = "*"
                     key={index}

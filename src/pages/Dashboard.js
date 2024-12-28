@@ -92,9 +92,6 @@ function Dashboard() {
 
    useEffect(() => {
       M.AutoInit();
-
-      
-
       // console.log("=======sprints======="+ localStorage.getItem("sprints"))
       // console.log("========project======"+ localStorage.getItem("project") ) 
       // console.log("=======selectedSprint======="+ localStorage.getItem("selectedSprint"))
@@ -665,9 +662,6 @@ function Dashboard() {
             }
           }
 
-
-
-          
         }
 
       }
@@ -698,10 +692,18 @@ function Dashboard() {
         if(tempList.length>0){
           var temp =[]
           var responseRecieved = await Method.getJiraTicketsDetails(tempList)
-
           for (var i = 0; i < responseRecieved.data.length ; i++) {
             var eachElement = responseRecieved.data[i]
-            eachElement["category"] = category
+
+            console.log("--------"+JSON.stringify(responseRecieved.data[i]))
+
+            //check if dev and qa hrs are available
+            if ( !responseRecieved.data[i].fields.hasOwnProperty([projectSettings.dev_hr_key]) && !responseRecieved.data[i].fields.hasOwnProperty([projectSettings.qa_hr_key]) ) {
+              eachElement["category"] = "SPILLOVERS"
+            }else{
+              eachElement["category"] = category
+            }
+            
             eachElement["remainingQaHr"] = 0
             eachElement["remainingDevHr"] = 0
             eachElement["devEnabled"] = true
@@ -709,6 +711,7 @@ function Dashboard() {
             eachElement["comment"] = ""
             temp.push(eachElement)         
           }
+
           tempAllData.push(...temp)
         }
       } 
@@ -748,7 +751,6 @@ function Dashboard() {
     return assignedHrs
   }
 
-
   const userlistFromModal=async(e, isDev)=>{
     var role = "dev"
     if(!isDev){
@@ -784,7 +786,6 @@ function Dashboard() {
     M.toast({html: '<span style="color:yellow">User added</span>', classes: 'rounded'})
   }
 
-
   const openassignModelPoupup=()=>{
     var elem = document.getElementById("AssignSprint")
     var instance = M.Modal.init(elem,{dismissible:false})
@@ -801,7 +802,6 @@ function Dashboard() {
     return tempArray
   }
 
-
   const updateSprintConfig=(days, hours, holiday, buffer)=>{
     var temp = sprintSettings
     temp.days = days
@@ -817,7 +817,6 @@ function Dashboard() {
     setIsEditEnabled(true)
 
   }
-
 
   const onUserRowClick=(e)=>{
     setSelectedUserForEdit(e)
@@ -846,7 +845,6 @@ function Dashboard() {
     
     setSelectedUsers(temp,[getTotalResourceHrAvailable(temp,totalSprintHrsFoeEachuser, sprintSettings)])
     M.toast({html: '<span style="color:yellow">User data updated</span>', classes: 'rounded'})
-
 
     var elem = document.getElementById("editUserData")
       var instance = M.Modal.getInstance(elem)
@@ -877,8 +875,6 @@ function Dashboard() {
       var instance = M.Modal.getInstance(elem)
       instance.close()
   }
-
-
 
 
   const reduceHrFromSelectedUser=(user, hrsToReduce)=>{
@@ -953,8 +949,6 @@ function Dashboard() {
       reduceHrFromSelectedUser(e.fields[projectSettings.qa_user_field], hrs)
     }
     
-
-
       var tempDev = 0
       var tempQA = 0
 
@@ -1196,7 +1190,7 @@ function Dashboard() {
                   <div className="wrapLabel">{badges(item.fields.labels)}</div>
                 </div>
 
-                <div className="m-top-10 grey-text f-10">{item.fields.assignee.displayName} {item.fields[projectSettings.qa_user_field] !== null? ` | ${item.fields[projectSettings.qa_user_field].displayName}`: null}</div>
+                <div className="m-top-10 grey-text f-10">{item.fields.assignee !== null? item.fields.assignee.displayName : "Not Assigned"  } {item.fields[projectSettings.qa_user_field] !== null? ` | ${item.fields[projectSettings.qa_user_field].displayName}`: null}</div>
 
 
                 <div className="f-10 grey-text m-top-10">{(item.fields.aggregatetimespent/3600).toFixed(2)}hrs/{(item.fields.aggregatetimeoriginalestimate/3600).toFixed(2)}hrs</div>
@@ -1398,7 +1392,7 @@ function Dashboard() {
           :
           <div className="d-flex">
             {!fullSiteLoader && !isEditEnabled?
-              <i class="material-icons orange-text p-20-right hand"  onClick={()=>{openReportModal()}} style={{fontSize:40, marginTop:2}}>picture_as_pdf</i>
+              <i className="material-icons orange-text p-20-right hand"  onClick={()=>{openReportModal()}} style={{fontSize:40, marginTop:2}}>picture_as_pdf</i>
               :null
             }
             {unsavedChanges?

@@ -108,23 +108,23 @@ const UpdateProject=(props)=> {
                 <div className="row">
                   <div className="input-field col s6">
                     <input id="project_id_update"  disabled type="text" className="validate active" value={jiraProjectIdUpdate} onChange={(e)=>{setJiraProjectIdUpdate(e.target.value)}}/>
-                    <label for="project_id_update">Jira Project ID</label>
+                    <label htmlFor="project_id_update">Jira Project ID</label>
                   </div>
                   <div className="input-field col s6">
                     <input id="Project_Name_update" type="text" className="validate" value={projectNameUpdate}  onChange={(e)=>{setProjectNameUpdate(e.target.value)}}/>
-                    <label for="Project_Name_update">Project Name</label>
+                    <label htmlFor="Project_Name_update">Project Name</label>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="input-field col s6">
                     <input id="project_Teams_update" type="text" className="validate active" value={teamsUpdate} onChange={(e)=>{setTeamsUpdate(e.target.value)}}/>
-                    <label for="project_Teams_update">Teams</label>
+                    <label htmlFor="project_Teams_update">Teams</label>
                     <span className="helper-text">Add multiple team using comma seperated eg Team A, Team B </span>
                   </div>
                   <div className="input-field col s6">
                     <input id="Project_Pin_update" type="number" className="validate" value={projectPinUpdate}  onChange={(e)=>{setProjectPinUpdate(e.target.value)}}/>
-                    <label for="Project_Pin_update">Password</label>
+                    <label htmlFor="Project_Pin_update">Password</label>
                     <span className="helper-text">Six digit number required</span>
                   </div>
                 </div>
@@ -136,25 +136,25 @@ const UpdateProject=(props)=> {
                 <div className="row m-top-30">
                   <div className="input-field col s6">
                     <input id="QA_HR_Key_update" type="text" className="validate" value={qaHrKeyUpdate} onChange={(e)=>{setQaHrKeyUpdate(e.target.value)}}/>
-                    <label for="QA_HR_Key_update">QA Hr Key (JIRA)</label>
+                    <label htmlFor="QA_HR_Key_update">QA Hr Key (JIRA)</label>
                   </div>
                   <div className="input-field col s6">
                     <input id="DEV_HR_Key_update" type="text" className="validate" value={devHrKeyUpdate} onChange={(e)=>{setDevHrKeyUpdate(e.target.value)}}/>
-                    <label for="DEV_HR_Key_update">Dev Hr Key (JIRA)</label>
+                    <label htmlFor="DEV_HR_Key_update">Dev Hr Key (JIRA)</label>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="input-field col s6">
                     <input id="QA_User_update" type="text" className="validate" value={qaUserFieldUpdate} onChange={(e)=>{setQaUserFieldUpdate(e.target.value)}}/>
-                    <label for="QA_User_update">QA User Field (JIRA)</label>
+                    <label htmlFor="QA_User_update">QA User Field (JIRA)</label>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="input-field col s6">
                     <input id="sprintKey_update" type="text" value={sprintKeyUpdate} className="validate" onChange={(e)=>{setSprintKeyUpdate(e.target.value)}}/>
-                    <label for="QA_User">Sprint custom Field (JIRA)</label>
+                    <label htmlFor="QA_User">Sprint custom Field (JIRA)</label>
                   </div>
                 </div>
 

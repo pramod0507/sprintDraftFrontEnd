@@ -221,8 +221,8 @@ const plugin = {
   
 
   return (
-      <div id="reportModal" class="modal modal-fixed-footer">
-        <div class="modal-content white" ref={reportTemplateRef} style={{letterSpacing: 0.02, padding:20}}>
+      <div id="reportModal" className="modal modal-fixed-footer">
+        <div className="modal-content white" ref={reportTemplateRef} style={{letterSpacing: 0.02, padding:20}}>
 
         <div className="d-flex j-between">
               <div className="">
@@ -253,120 +253,130 @@ const plugin = {
                 </div>
 
         </div>
-          
+          {/*distriution ticket*/}
           <table>
-            {/*distriution ticket*/}
-            <tr style={{border:0}}>
-              <td style={{height:200}}>
-                <Pie data={data} plugins={[plugin]} />
-              </td>
-              <td style={{width:'75%'}}>
-                <ul style={{borderRadius:10}} className="d-flex flex-column lighten-5 p-30 red">
-                  <li className="f-bold">TICKETS DISTRIBUTION</li> 
-                  <li>
-                  <table>
-                    <tr className="b-bottom">
-                      <td className="d-flex a-center">
-                        <div style={{height:10, width:30, backgroundColor:'rgba(66, 135, 245,0.5)', opacity:0.5}}/>
-                        <div className="m-left-5">BUSINESS</div>
-                      </td>
-                      <td>{props.totalDevBusinessHrFromJira + props.totalQABusinessHrFromJira} hrs</td>
-                      <td>{(((props.totalDevBusinessHrFromJira + props.totalQABusinessHrFromJira)/(props.totalDevBusinessHrFromJira + props.totalQABusinessHrFromJira + props.totalDevTechHrFromJira + props.totalQATechHrFromJira + props.totalDevSpilloverHrFromJira + props.totalQASpilloverHrFromJira))*100).toFixed(2)}%</td>
-                    </tr>
-                    <tr className="b-bottom">
-                      <td className="d-flex a-center">
-                        <div style={{height:10, width:30, backgroundColor:'rgba(24, 186, 113,0.5)'}}/>
-                        <div className="m-left-5">TECH TASKS</div>
-                      </td>
-                      <td>{props.totalDevTechHrFromJira + props.totalQATechHrFromJira} hrs</td>
-                      <td>{(((props.totalDevTechHrFromJira + props.totalQATechHrFromJira)/(props.totalDevBusinessHrFromJira + props.totalQABusinessHrFromJira + props.totalDevTechHrFromJira + props.totalQATechHrFromJira + props.totalDevSpilloverHrFromJira + props.totalQASpilloverHrFromJira))*100).toFixed(2)}%</td>
-                    </tr>
-                    <tr className="b-bottom">
-                      <td className="d-flex a-center">
-                        <div style={{height:10, width:30, backgroundColor:'rgba(250, 52, 118,0.5)'}}/>
-                        <div className="m-left-5">SPILLOVERS</div>
-                      </td>
-                      <td>{props.totalDevSpilloverHrFromJira + props.totalQASpilloverHrFromJira} hrs</td>
-                      <td>{(((props.totalDevSpilloverHrFromJira + props.totalQASpilloverHrFromJira)/(props.totalDevBusinessHrFromJira + props.totalQABusinessHrFromJira + props.totalDevTechHrFromJira + props.totalQATechHrFromJira + props.totalDevSpilloverHrFromJira + props.totalQASpilloverHrFromJira))*100).toFixed(2)}%</td>
-                    </tr>
-                  </table>
-                  </li>
-                  
-                </ul>
-              </td>
-            </tr>
-
-            {/*distriution Dev*/}
-
-            <tr style={{border:0}}>
-              <td style={{height:200, width:'50%'}}>
-                <div  className="b-thin b-r-3" style={{padding:30}}>
-                <div className="f-bold grey-text text-lighten-1">DEV ALLOCATIONS</div>
-                <Pie data={dataDevAllocation} plugins={[plugin]} />
-                <table>
-                    <tr className="b-bottom">
-                      <td className="d-flex a-center">
-                        <div style={{height:10, width:30, backgroundColor:'rgba(66, 135, 245,0.5)', opacity:0.5}}/>
-                        <div className="m-left-5">ALLOCATED</div>
-                      </td>
-                      <td>{props.totalDevHrFromJira} hrs</td>
-                    </tr>
-                    <tr className="b-bottom">
-                      <td className="d-flex a-center">
-                        <div style={{height:10, width:30, backgroundColor:'rgba(24, 186, 113,0.5)'}}/>
-                        <div className="m-left-5">AVAILABLE</div>
-                      </td>
-                      <td>{props.totalDevResourceHr} hrs</td>
-                    </tr>
-                    <tr className="b-bottom">
-                      <td className="d-flex a-center">
-                        <div style={{height:10, width:30, backgroundColor:'rgba(250, 52, 118,0.5)'}}/>
-                        <div className="m-left-5">REMAINING</div>
-                      </td>
-                      <td>{(props.totalDevResourceHr -  props.totalDevHrFromJira - ((props.totalDevResourceHr - props.totalDevTechHrFromJira)*(Number(props.sprintSettings.sprintBuffer)/100) )).toFixed(2)} hrs</td>
-                    </tr>
-                  </table>
-                </div>
-              </td>
-
-              {/*distriution Qa*/}
-              <td style={{height:200, width:'50%'}}>
-                <div  className="b-thin b-r-3" style={{padding:30}}>
-                <div className="f-bold grey-text text-lighten-1">QA ALLOCATIONS</div>
-                <Pie data={dataQaAllocation} plugins={[plugin]} />
-                <table>
-                    <tr className="b-bottom">
-                      <td className="d-flex a-center">
-                        <div style={{height:10, width:30, backgroundColor:'rgba(66, 135, 245,0.5)', opacity:0.5}}/>
-                        <div className="m-left-5">ALLOCATED</div>
-                      </td>
-                      <td>{props.totalQAHrFromJira.toFixed(2)} hrs</td>
-                    </tr>
-                    <tr className="b-bottom">
-                      <td className="d-flex a-center">
-                        <div style={{height:10, width:30, backgroundColor:'rgba(24, 186, 113,0.5)'}}/>
-                        <div className="m-left-5">AVAILABLE</div>
-                      </td>
-                      <td>{props.totalQAResourceHr.toFixed(2)} hrs</td>
-                    </tr>
-                    <tr className="b-bottom">
-                      <td className="d-flex a-center">
-                        <div style={{height:10, width:30, backgroundColor:'rgba(250, 52, 118,0.5)'}}/>
-                        <div className="m-left-5">REMAINING</div>
-                      </td>
-                      <td>{(props.totalQAResourceHr -  props.totalQAHrFromJira - ((props.totalQAResourceHr - props.totalQATechHrFromJira)*(Number(props.sprintSettings.sprintBuffer)/100) )).toFixed(2)} hrs</td>
-                    </tr>
-                  </table>
-                </div>
-              </td>
+            <tbody>
               
-            </tr>
+              <tr style={{border:0}}>
+                <td style={{height:200}}>
+                  <Pie data={data} plugins={[plugin]} />
+                </td>
+                <td style={{width:'75%'}}>
+                  <ul style={{borderRadius:10}} className="d-flex flex-column lighten-5 p-30 red">
+                    <li className="f-bold">TICKETS DISTRIBUTION</li> 
+                    <li>
+                    <table>
+                    <tbody>
+
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{height:10, width:30, backgroundColor:'rgba(66, 135, 245,0.5)', opacity:0.5}}/>
+                          <div className="m-left-5">BUSINESS</div>
+                        </td>
+                        <td>{props.totalDevBusinessHrFromJira + props.totalQABusinessHrFromJira} hrs</td>
+                        <td>{(((props.totalDevBusinessHrFromJira + props.totalQABusinessHrFromJira)/(props.totalDevBusinessHrFromJira + props.totalQABusinessHrFromJira + props.totalDevTechHrFromJira + props.totalQATechHrFromJira + props.totalDevSpilloverHrFromJira + props.totalQASpilloverHrFromJira))*100).toFixed(2)}%</td>
+                      </tr>
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{height:10, width:30, backgroundColor:'rgba(24, 186, 113,0.5)'}}/>
+                          <div className="m-left-5">TECH TASKS</div>
+                        </td>
+                        <td>{props.totalDevTechHrFromJira + props.totalQATechHrFromJira} hrs</td>
+                        <td>{(((props.totalDevTechHrFromJira + props.totalQATechHrFromJira)/(props.totalDevBusinessHrFromJira + props.totalQABusinessHrFromJira + props.totalDevTechHrFromJira + props.totalQATechHrFromJira + props.totalDevSpilloverHrFromJira + props.totalQASpilloverHrFromJira))*100).toFixed(2)}%</td>
+                      </tr>
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{height:10, width:30, backgroundColor:'rgba(250, 52, 118,0.5)'}}/>
+                          <div className="m-left-5">SPILLOVERS</div>
+                        </td>
+                        <td>{props.totalDevSpilloverHrFromJira + props.totalQASpilloverHrFromJira} hrs</td>
+                        <td>{(((props.totalDevSpilloverHrFromJira + props.totalQASpilloverHrFromJira)/(props.totalDevBusinessHrFromJira + props.totalQABusinessHrFromJira + props.totalDevTechHrFromJira + props.totalQATechHrFromJira + props.totalDevSpilloverHrFromJira + props.totalQASpilloverHrFromJira))*100).toFixed(2)}%</td>
+                      </tr>
+                    </tbody>
+                    </table>
+                    </li>
+                    
+                  </ul>
+                </td>
+              </tr>
+
+              {/*distriution Dev*/}
+
+              <tr style={{border:0}}>
+                <td style={{height:200, width:'50%'}}>
+                  <div  className="b-thin b-r-3" style={{padding:30}}>
+                  <div className="f-bold grey-text text-lighten-1">DEV ALLOCATIONS</div>
+                  <Pie data={dataDevAllocation} plugins={[plugin]} />
+                  <table>
+                    <tbody>
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{height:10, width:30, backgroundColor:'rgba(66, 135, 245,0.5)', opacity:0.5}}/>
+                          <div className="m-left-5">ALLOCATED</div>
+                        </td>
+                        <td>{props.totalDevHrFromJira} hrs</td>
+                      </tr>
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{height:10, width:30, backgroundColor:'rgba(24, 186, 113,0.5)'}}/>
+                          <div className="m-left-5">AVAILABLE</div>
+                        </td>
+                        <td>{props.totalDevResourceHr} hrs</td>
+                      </tr>
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{height:10, width:30, backgroundColor:'rgba(250, 52, 118,0.5)'}}/>
+                          <div className="m-left-5">REMAINING</div>
+                        </td>
+                        <td>{(props.totalDevResourceHr -  props.totalDevHrFromJira - ((props.totalDevResourceHr - props.totalDevTechHrFromJira)*(Number(props.sprintSettings.sprintBuffer)/100) )).toFixed(2)} hrs</td>
+                      </tr>
+                    </tbody>
+                    </table>
+                  </div>
+                </td>
+
+                {/*distriution Qa*/}
+                <td style={{height:200, width:'50%'}}>
+                  <div  className="b-thin b-r-3" style={{padding:30}}>
+                  <div className="f-bold grey-text text-lighten-1">QA ALLOCATIONS</div>
+                  <Pie data={dataQaAllocation} plugins={[plugin]} />
+                  <table>
+                    <tbody>
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{height:10, width:30, backgroundColor:'rgba(66, 135, 245,0.5)', opacity:0.5}}/>
+                          <div className="m-left-5">ALLOCATED</div>
+                        </td>
+                        <td>{props.totalQAHrFromJira.toFixed(2)} hrs</td>
+                      </tr>
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{height:10, width:30, backgroundColor:'rgba(24, 186, 113,0.5)'}}/>
+                          <div className="m-left-5">AVAILABLE</div>
+                        </td>
+                        <td>{props.totalQAResourceHr.toFixed(2)} hrs</td>
+                      </tr>
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{height:10, width:30, backgroundColor:'rgba(250, 52, 118,0.5)'}}/>
+                          <div className="m-left-5">REMAINING</div>
+                        </td>
+                        <td>{(props.totalQAResourceHr -  props.totalQAHrFromJira - ((props.totalQAResourceHr - props.totalQATechHrFromJira)*(Number(props.sprintSettings.sprintBuffer)/100) )).toFixed(2)} hrs</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                   
+                  </div>
+                </td>
+                
+              </tr>
+            </tbody>
           </table>
 
+          {/*User List*/}
           <div style={{marginTop:0}}>
           <table>
-            {/*User List*/}
-
+           <tbody>
             <tr>
               <td>
                 <table className="m-top-20">
@@ -392,14 +402,14 @@ const plugin = {
                 </table>
               </td>
           </tr>
-
+          </tbody>
           </table>
           </div>
 
         </div>
-        <div class="modal-footer">
-          <a href="#!" class="waves-effect waves-green btn-flat" onClick={()=>{handleGeneratePdf()}}>GENERATE PDF</a>
-          <a href="#!" class="modal-close waves-effect waves-green btn-flat">CLOSE</a>
+        <div className="modal-footer">
+          <a href="#!" className="waves-effect waves-green btn-flat" onClick={()=>{handleGeneratePdf()}}>GENERATE PDF</a>
+          <a href="#!" className="modal-close waves-effect waves-green btn-flat">CLOSE</a>
         </div>
       </div>
   );

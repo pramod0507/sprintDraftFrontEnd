@@ -12,7 +12,7 @@ const screenHeight = window.innerHeight
 
 const CreateProject=(props)=> {
   
-  const [actualPin, setActualPin] = useState("111111")
+  const [actualPin, setActualPin] = useState("332211")
 
   const [jiraProjectId, setJiraProjectId] = useState("")
   const [projectName, setProjectName] = useState("")
@@ -61,6 +61,16 @@ const CreateProject=(props)=> {
           instance.close()
            M.toast({html: `<span style="color:yellow">New project created successfully</span>`, classes: 'rounded'})
            props.onCreateComplete()
+
+            setJiraProjectId("")
+            setProjectName("")
+            setTeams("")
+            setQaHrKey("")
+            setDevHrKey("")
+            setQaUserField("")
+            setSprintKey("")
+            setProjectPin("")
+            setSprintBoardId("")
           
        }
       
@@ -124,23 +134,23 @@ const CreateProject=(props)=> {
                 <div className="row">
                   <div className="input-field col s6">
                     <input id="project_id" type="text" className="validate" onChange={(e)=>{setJiraProjectId(e.target.value)}}/>
-                    <label for="project_id">Jira Project ID</label>
+                    <label htmlFor="project_id">Jira Project ID</label>
                   </div>
                   <div className="input-field col s6">
                     <input id="Project_Name" type="text" className="validate"  onChange={(e)=>{setProjectName(e.target.value)}}/>
-                    <label for="Project_Name">Project Name</label>
+                    <label htmlFor="Project_Name">Project Name</label>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="input-field col s6">
                     <input id="project_Teams" type="text" className="validate" onChange={(e)=>{setTeams(e.target.value)}}/>
-                    <label for="project_Teams">Teams</label>
+                    <label htmlFor="project_Teams">Teams</label>
                     <span className="helper-text">Add multiple team using comma seperated eg Team A, Team B</span>
                   </div>
                   <div className="input-field col s6">
                     <input id="Project_Pin" type="number" className="validate"  onChange={(e)=>{setProjectPin(e.target.value)}}/>
-                    <label for="Project_Pin">Password</label>
+                    <label htmlFor="Project_Pin">Password</label>
                     <span className="helper-text">Six digit number required</span>
                   </div>
                 </div>
@@ -152,30 +162,30 @@ const CreateProject=(props)=> {
                 <div className="row m-top-30">
                   <div className="input-field col s6">
                     <input id="QA_HR_Key" type="text" className="validate" onChange={(e)=>{setQaHrKey(e.target.value)}}/>
-                    <label for="QA_HR_Key">QA Hr Key (JIRA)</label>
+                    <label htmlFor="QA_HR_Key">QA Hr Key (JIRA)</label>
                   </div>
                   <div className="input-field col s6">
                     <input id="DEV_HR_Key" type="text" className="validate" onChange={(e)=>{setDevHrKey(e.target.value)}}/>
-                    <label for="DEV_HR_Key">Dev Hr Key (JIRA)</label>
+                    <label htmlFor="DEV_HR_Key">Dev Hr Key (JIRA)</label>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="input-field col s6">
                     <input id="QA_User" type="text" className="validate" onChange={(e)=>{setQaUserField(e.target.value)}}/>
-                    <label for="QA_User">QA User Field (JIRA)</label>
+                    <label htmlFor="QA_User">QA User Field (JIRA)</label>
                   </div>
 
                   <div className="input-field col s6">
                     <input id="zs_sprint_board" type="text" className="validate" onChange={(e)=>{setSprintBoardId(e.target.value)}}/>
-                    <label for="zs_sprint_board">Sprint Board Id</label>
+                    <label htmlFor="zs_sprint_board">Sprint Board Id</label>
                   </div>
                 </div>
 
                 <div className="row">
                   <div className="input-field col s6">
                     <input id="sprintKey" type="text" className="validate" onChange={(e)=>{setSprintKey(e.target.value)}}/>
-                    <label for="sprintKey">Sprint custom Field (JIRA)</label>
+                    <label htmlFor="sprintKey">Sprint custom Field (JIRA)</label>
                   </div>
                 </div>
 

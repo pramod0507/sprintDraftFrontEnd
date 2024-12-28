@@ -76,10 +76,10 @@ const EditUserData=(props)=> {
           <div className="modal-content">
             <div className="d-flex j-between">
               <h4>Edit User</h4>
-              <div class="switch" onChange={()=>{toggleTeammembership(!isUserInTeam)}}>
+              <div className="switch" onChange={()=>{toggleTeammembership(!isUserInTeam)}}>
                 <label>
                   <input type="checkbox" checked={isUserInTeam}/>
-                  <span class="lever"></span>
+                  <span className="lever"></span>
                   User associated in this team 
                 </label>
               </div>

@@ -43,14 +43,14 @@ const SelectSprint=(props)=> {
   const renderRows=()=>{
     return(
       props.sprintList.map((item, index) =>
-          <option  value={item.sprint_id}>{item.sprint_id}</option>
+          <option key ={"select_sprint_"+index}  value={item.sprint_id}>{item.sprint_id}</option>
         )
   )}
 
   const renderTeams=(e)=>{
     return(
       e.map((item, index) =>
-          <option  value={item}>{item}</option>
+          <option key ={"select_team_"+index}  value={item}>{item}</option>
         )
   )}
 

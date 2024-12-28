@@ -106,7 +106,7 @@ const AssignSprint=(props)=> {
                 <div className="">
                   <div className="input-field">
                     <input id="project_id" type="text" value={searchKeyword} className="validate" onChange={(e)=>{setSearchKeyword(e.target.value); onSearch(e.target.value) }}/>
-                    <label for="project_id">Search Sprint </label>
+                    <label htmlFor="project_id">Search Sprint </label>
                   </div>
                 </div>
 
