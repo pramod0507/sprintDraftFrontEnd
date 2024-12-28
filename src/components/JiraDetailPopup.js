@@ -133,7 +133,12 @@ const JiraDetailPopup=(props)=> {
                 <div className="d-flex">
                   <div className="d-flex a-center m-top-10 p-right-5 ">
                     <i className="material-icons p-right-5 teal-text" style={{fontSize:14}}>person</i>
+                    {props.selectedJira.fields.assignee !==null?
+                    <span>Not Assigned</span>
+                    :
                     <span>Assigned: {props.selectedJira.fields.assignee.displayName}</span>
+                    }
+                    
                   </div>
                   
                   {props.selectedJira.fields[props.projectSettings.qa_user_field] !== null?

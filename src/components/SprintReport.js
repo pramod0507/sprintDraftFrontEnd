@@ -202,9 +202,6 @@ const plugin = {
   },[])
 
   const handleGeneratePdf = () => {
-    
-
-
     const doc = new jsPDF("p","px",[reportTemplateRef.current.offsetWidth,Number(reportTemplateRef.current.offsetWidth)*3]);
 
     // Adding the fonts.
@@ -213,10 +210,87 @@ const plugin = {
 
     doc.html(reportTemplateRef.current, {
       async callback(doc) {
-        await doc.save('document');
+        await doc.save(props.sprintId);
       },
     });
   };
+
+
+  const renderJiraTickets = (array)=>{
+    var tempArray = []
+    for (var i = 0; i < array.length; i++) {
+      var eachElem = <span className="badge teal white-text b-r-3" style={{marginLeft:5, marginRight:5, marginBottom:5}}>{array[i]}</span>
+      tempArray.push(eachElem)
+    }
+    return tempArray;
+  }
+
+
+  const renderJiraId=()=>{
+    var tempArraySpillovers = []
+
+    var spilloverArray = []
+    var businessArray = []
+    var techTaskArray = []
+    var qaAutomationArray = []
+
+
+    for(var i=0; i< props.allJiraData.length; i++){
+
+      if (props.allJiraData[i].category == "SPILLOVERS") {
+            spilloverArray.push(props.allJiraData[i].key)
+      }
+
+      if (props.allJiraData[i].category == "BUSINESS") {
+            businessArray.push(props.allJiraData[i].key)
+      }
+
+      if (props.allJiraData[i].category == "TECH TASKS") {
+            techTaskArray.push(props.allJiraData[i].key)
+      }
+
+      if (props.allJiraData[i].category == "QA AUTOMATION") {
+            qaAutomationArray.push(props.allJiraData[i].key)
+      }
+    }
+
+    var spillElement = <tr><td style={{width:120}} className="">SPILLOVERS</td>
+                           <td>{renderJiraTickets(spilloverArray)}</td>
+                        </tr>
+    var businessElement = <tr><td style={{width:120}} className="">BUSINESS</td>
+                           <td>{renderJiraTickets(businessArray)}</td>
+                        </tr>
+    var techElement = <tr><td style={{width:120}} className="">TECH TASK</td>
+                           <td>{renderJiraTickets(techTaskArray)}</td>
+                        </tr>
+    var qaautomationElement = <tr><td style={{width:120}} className="">QA AUTOMATION</td>
+                           <td>{renderJiraTickets(qaAutomationArray)}</td>
+                        </tr>
+
+    if(spilloverArray.length > 0){
+      tempArraySpillovers.push(spillElement)
+    }
+
+    if(businessArray.length > 0){
+      tempArraySpillovers.push(businessElement)
+    }
+
+    if(techTaskArray.length > 0){
+      tempArraySpillovers.push(techElement)
+    }
+
+    if(qaAutomationArray.length > 0){
+      tempArraySpillovers.push(qaautomationElement)
+    }
+    
+     
+      
+       
+
+    return tempArraySpillovers
+
+
+  }
 
   
 
@@ -330,6 +404,13 @@ const plugin = {
                         </td>
                         <td>{(props.totalDevResourceHr -  props.totalDevHrFromJira - ((props.totalDevResourceHr - props.totalDevTechHrFromJira)*(Number(props.sprintSettings.sprintBuffer)/100) )).toFixed(2)} hrs</td>
                       </tr>
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{width:30, backgroundColor:'white'}}>DEV</div>
+                          <div className="m-left-5">UTILIZATION</div>
+                        </td>
+                        <td>{((props.totalDevHrFromJira/props.totalDevResourceHr )*100).toFixed(2)} %</td>
+                      </tr>
                     </tbody>
                     </table>
                   </div>
@@ -363,6 +444,13 @@ const plugin = {
                         </td>
                         <td>{(props.totalQAResourceHr -  props.totalQAHrFromJira - ((props.totalQAResourceHr - props.totalQATechHrFromJira)*(Number(props.sprintSettings.sprintBuffer)/100) )).toFixed(2)} hrs</td>
                       </tr>
+                      <tr className="b-bottom">
+                        <td className="d-flex a-center">
+                          <div style={{width:30, backgroundColor:'white'}}>QA</div>
+                          <div className="m-left-5">UTILIZATION</div>
+                        </td>
+                        <td>{((props.totalQAHrFromJira/props.totalQAResourceHr)*100).toFixed(2)} %</td>
+                      </tr>
                       </tbody>
                     </table>
                    
@@ -374,12 +462,13 @@ const plugin = {
           </table>
 
           {/*User List*/}
-          <div style={{marginTop:0}}>
+          <div  style={{marginTop:30}} className="f-bold grey-text text-lighten-1">USERS ALLOCATIONS</div>
+          <div>
           <table>
            <tbody>
             <tr>
               <td>
-                <table className="m-top-20">
+                <table className="">
                   <thead>
                     <tr>
                         <th>User</th>
@@ -404,6 +493,17 @@ const plugin = {
           </tr>
           </tbody>
           </table>
+          </div>
+
+          {/*Jira list*/}
+          <div style={{}}>
+            <div  style={{marginTop:30}} className="f-bold grey-text text-lighten-1">JIRA TICKETS ALLOCATIONS</div>
+            <table>
+           <tbody>
+            {renderJiraId()}
+          </tbody>
+          </table>
+
           </div>
 
         </div>

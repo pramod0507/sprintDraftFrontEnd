@@ -23,6 +23,7 @@ import SprintReport from '../components/SprintReport';
 import DeleteConfirmation from '../components/DeleteConfirmation.js'
 
 
+
 function Dashboard() {
 
  
@@ -104,7 +105,6 @@ function Dashboard() {
         setProjectId(JSON.parse(localStorage.getItem("project")).id )
         setSelectedTeam(localStorage.getItem("selectedTeam"))
         setTeamList(JSON.parse( JSON.parse(localStorage.getItem("project")).project_settings).teams)
-
         setProjectSettings(JSON.parse(localStorage.getItem("project")))
         setSprintId(localStorage.getItem("selectedSprint"))
 
@@ -261,6 +261,8 @@ function Dashboard() {
 
       setAllJiraData(tempAllData)
       updateDevAndQATotalHrs(tempAllData)
+
+      tempUsers.sort((a, b) => a.role.localeCompare(b.role));
       setSelectedUsers(tempUsers)
       // jiraAddedCalculateUsersAssignedHrs(tempUsers,tempAllData,true)
 
@@ -348,6 +350,7 @@ function Dashboard() {
           }
 
       }
+      tempUsers.sort((a, b) => a.role.localeCompare(b.role));
       setSelectedUsers(tempUsers)
       setAllJiraData(jiraList)
    }
@@ -361,6 +364,7 @@ function Dashboard() {
       if(responseRecieved.status){
         setSprintSettingsRaw(responseRecieved.data[0])
         setSprintSettings( JSON.parse(responseRecieved.data[0].sprint_settings) )
+
         //add tickets
         var sprintTicketsTemp = JSON.parse(responseRecieved.data[0].sprint_tickets)
         var tempAllData = []
@@ -389,6 +393,7 @@ function Dashboard() {
         for (var j = 0; j < tempUser.length; j++) {
           tempUserFromDatabase.push(tempUser[j])
         }
+        tempUserFromDatabase.sort((a, b) => a.role.localeCompare(b.role));
         setSelectedUsers(tempUserFromDatabase)
 
          calaculateSprintHrsForEachUser( JSON.parse(responseRecieved.data[0].sprint_settings).days, JSON.parse(responseRecieved.data[0].sprint_settings).perDay, JSON.parse(responseRecieved.data[0].sprint_settings).holiday, JSON.parse(responseRecieved.data[0].sprint_settings).sprintBuffer, tempUserFromDatabase, JSON.parse(responseRecieved.data[0].sprint_settings) )
@@ -599,6 +604,7 @@ function Dashboard() {
           }
         }
     }
+    tempUsers.sort((a, b) => a.role.localeCompare(b.role));
     setSelectedUsers(tempUsers)
 
   }
@@ -780,6 +786,7 @@ function Dashboard() {
       setIsEditEnabled(true)
 
     }
+    temp.sort((a, b) => a.role.localeCompare(b.role));
     setSelectedUsers(temp)
 
     var elem = document.getElementById("selectusers")
@@ -845,7 +852,8 @@ function Dashboard() {
     temp[index].role = role
     temp[index].meetings = Number(meetings)
     temp[index].inTeam = inTeam
-    
+
+    temp.sort((a, b) => a.role.localeCompare(b.role));
     setSelectedUsers(temp,[getTotalResourceHrAvailable(temp,totalSprintHrsFoeEachuser, sprintSettings)])
     M.toast({html: '<span style="color:yellow">User data updated</span>', classes: 'rounded'})
 
@@ -891,6 +899,7 @@ function Dashboard() {
 
         temp[index].allocatedHrs = temp[index].allocatedHrs - hrsToReduce
       }
+      temp.sort((a, b) => a.role.localeCompare(b.role));
       setSelectedUsers(temp)
     }
   }
@@ -1027,6 +1036,8 @@ function Dashboard() {
     temp = temp.concat( selectedUsers )
     var index = temp.findIndex(x=> x.userDetail.accountId ===  selectedUserForEdit.userDetail.accountId)
     temp = temp.toSpliced(index,1)
+
+    temp.sort((a, b) => a.role.localeCompare(b.role));
     setSelectedUsers(temp,[getTotalResourceHrAvailable(temp, totalSprintHrsFoeEachuser, sprintSettings)])
     M.toast({html: '<span style="color:yellow">User Removed</span>', classes: 'rounded'})
 
@@ -1050,11 +1061,21 @@ function Dashboard() {
 
         <tr key={index} className="hand" onClick={()=>{onUserRowClick(item)}}>
           <td>
-              <div className="d-flex" style={{width:120}}>
-                 {item.hasOwnProperty("inTeam") && item.inTeam == false?<s className="grey-text">{item.userDetail.displayName}</s>: item.userDetail.displayName}
-              </div>
-              <div className="grey-text f-10">
-                {item.role == "qa"? "QA Resource": "Dev Resource"}
+              <div className="d-flex">
+                {item.role == "qa"? 
+                  <i className="material-icons green-text rotate-180 m-left-10" style={{fontSize:6, marginTop:5, marginRight:3}}>fiber_manual_record</i>
+                  : 
+                  <i className="material-icons orange-text rotate-180 m-left-10"   style={{fontSize:6, marginTop:5, marginRight:3}}>fiber_manual_record</i>
+                }
+                
+                <div>
+                  <div className="d-flex" style={{width:120}}>
+                     {item.hasOwnProperty("inTeam") && item.inTeam == false?<s className="grey-text"><span>{item.userDetail.displayName}</span></s>: item.userDetail.displayName}
+                  </div>
+                  <div className="grey-text f-10">
+                    {item.role == "qa"? "QA Resource": "Dev Resource"}
+                  </div>
+                </div>
               </div>
           </td>
           <td>
@@ -1260,7 +1281,7 @@ function Dashboard() {
                 <div className="m-top-10">
                   <div className="d-flex j-center">
                     <div className="p-right-5">{ item.remainingDevHr }</div>
-                    |
+                    <div>|</div>
                     <div className="p-left-5">{item.remainingQaHr}</div>
                   </div>
                 </div>
@@ -1478,7 +1499,7 @@ function Dashboard() {
             
             <div className="col s12 m6 l6">
               <div className="grey-text">DEV</div>
-              <div  style={{maxWidth:225}}>
+              <div  style={{maxWidth:300}}>
                 <div className="d-flex a-center p-10 grey lighten-3 b-r-3" >
                       <div>
                         <div className="a-center d-flex flex-column f-10">ALLOCATED</div>
@@ -1494,6 +1515,14 @@ function Dashboard() {
                         <div className="f-10">REMAINING</div>
                         <div className="d-flex j-center a-center teal f-bold white-text b-r-3" style={{height:30,width:60}}>{(totalDevResourceHr -  totalDevHrFromJira - ((totalDevResourceHr - totalDevTechHrFromJira)*(Number(sprintSettings.sprintBuffer)/100) )).toFixed(2)}</div>
                       </div>
+
+                      {((totalDevHrFromJira/totalDevResourceHr )*100) >0?
+                      <div className="a-center d-flex flex-column m-left-10 ">
+                        <div className="f-10">UTILIZATION</div>
+                        <div className={`d-flex j-center a-center ${((totalDevHrFromJira/totalDevResourceHr )*100)> 100? "orange": "green"} f-bold white-text b-r-3`}  style={{height:30,width:70}}>{ ((totalDevHrFromJira/totalDevResourceHr )*100).toFixed(2)  } %</div>
+                      </div>
+                      :null
+                      }
                 </div>
                 <div className="right-align  f-10 grey-text">Above stats are in hrs</div>
               </div>
@@ -1501,7 +1530,7 @@ function Dashboard() {
 
             <div  className="col  s12 m6 l6">
             <div className="grey-text">QA</div>
-            <div  style={{maxWidth:225}}>
+            <div  style={{maxWidth:300}}>
               <div className="d-flex a-center p-10 grey lighten-3 b-r-3">
                     <div>
                       <div className="a-center d-flex flex-column f-10">ALLOCATED</div>
@@ -1517,6 +1546,14 @@ function Dashboard() {
                       <div className="f-10">REMAINING</div>
                       <div className="d-flex j-center a-center teal f-bold white-text b-r-3" style={{height:30,width:60}}>{(totalQAResourceHr -  totalQAHrFromJira - ((totalQAResourceHr - totalQATechHrFromJira)*(Number(sprintSettings.sprintBuffer)/100) )).toFixed(2)}</div>
                     </div>
+
+                    {((totalQAHrFromJira/totalQAResourceHr)*100) > 0?
+                    <div className="a-center d-flex flex-column m-left-10">
+                      <div className="f-10">UTILIZATION</div>
+                      <div className={`d-flex j-center a-center ${((totalQAHrFromJira/totalQAResourceHr)*100)> 100? "orange": "green"} f-bold white-text b-r-3`} style={{height:30,width:70}}>{((totalQAHrFromJira/totalQAResourceHr)*100).toFixed(2)} %</div>
+                    </div>
+                    :null
+                    }
               </div>
               <div className="right-align  f-10 grey-text">Above stats are in hrs</div>
 
@@ -1717,6 +1754,23 @@ function Dashboard() {
               {renderUsersRows()}
             </tbody>
           </table>
+          {selectedUsers.length > 0?
+            <div className="d-flex right">
+              <div className="d-flex">
+                <i className="material-icons green-text rotate-180 m-left-10" style={{fontSize:6, marginTop:5, marginRight:3}}>fiber_manual_record</i>
+                <span className="f-10">QA User</span>
+              </div>
+              
+              <div className="d-flex">
+                <i className="material-icons orange-text rotate-180 m-left-10"   style={{fontSize:6, marginTop:5, marginRight:3}}>fiber_manual_record</i>
+                <span className="f-10">Dev User</span>
+              </div>
+              
+          </div>
+          :null
+          }
+          
+
           </div>
           {/*Users list end*/}
 
@@ -1748,6 +1802,7 @@ function Dashboard() {
 
       <SprintReport selectedUsers={selectedUsers} totalSprintHrsFoeEachuser={totalSprintHrsFoeEachuser} sprintSettings={sprintSettings} projectSettings={projectSettings} totalDevHrFromJira={totalDevHrFromJira} totalDevResourceHr={totalDevResourceHr} totalDevTechHrFromJira={totalDevTechHrFromJira} totalQAResourceHr={totalQAResourceHr} totalDevBusinessHrFromJira={totalDevBusinessHrFromJira} totalDevSpilloverHrFromJira={totalDevSpilloverHrFromJira} totalQAHrFromJira={totalQAHrFromJira} totalQATechHrFromJira={totalQATechHrFromJira} totalQABusinessHrFromJira={totalQABusinessHrFromJira} totalQASpilloverHrFromJira={totalQASpilloverHrFromJira}
         sprintId={sprintId}
+        allJiraData={allJiraData}
       />
 
       <DeleteConfirmation onDeleteConfirmation={onDeleteConfirmation}/>
